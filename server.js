@@ -6,7 +6,7 @@ const path = require("path");
 const fs = require("fs");
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000; // ✅ เลือกใช้ PORT จาก env ถ้ามี
 
 app.use(cors());
 app.use(express.json());
@@ -17,7 +17,6 @@ if (!fs.existsSync("uploads")) {
 }
 
 let conn;
-
 
 const initMySQL = async () => {
   try {
@@ -33,7 +32,6 @@ const initMySQL = async () => {
     console.error("❌ Failed to connect to MySQL:", err.message);
   }
 };
-
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -56,7 +54,6 @@ app.get("/projects", async (req, res) => {
   }
 });
 
-
 app.post("/projects", upload.single("file"), async (req, res) => {
   try {
     const { firstname, lastname, description, approver } = req.body;
@@ -76,10 +73,7 @@ app.post("/projects", upload.single("file"), async (req, res) => {
 app.put("/projects/:id/approve", async (req, res) => {
   try {
     const { id } = req.params;
-    const [result] = await conn.query(
-      "UPDATE project SET status = 'approved' WHERE id = ?",
-      [id]
-    );
+    const [result] = await conn.query("UPDATE project SET status = 'approved' WHERE id = ?", [id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "ไม่พบเอกสาร ID นี้" });
@@ -103,7 +97,14 @@ app.delete("/projects/:id", async (req, res) => {
   }
 });
 
+// ✅ เพิ่มการตรวจสอบ port ว่าง
 app.listen(port, async () => {
   await initMySQL();
   console.log(`🚀 Server running on http://localhost:${port}`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${port} ถูกใช้งานอยู่ ลองใช้พอร์ตอื่น`);
+  } else {
+    console.error(err);
+  }
 });
