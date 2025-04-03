@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: mysql_db_820
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: webproject
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql_data_820:/var/lib/mysql
+    networks:
+      - weblab820
+    restart: always
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin_820
+    environment:
+      PMA_HOST: mysql_db_820
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8821:80"
+    depends_on:
+      - db
+    networks:
+      - weblab820
+    restart: always
+
+networks:
+  weblab820:
+    driver: bridge
+
+volumes:
+  mysql_data_820:
+    driver: local
