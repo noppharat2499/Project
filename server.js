@@ -6,7 +6,7 @@ const path = require("path");
 const fs = require("fs");
 
 const app = express();
-const port = process.env.PORT || 8000; // ✅ เลือกใช้ PORT จาก env ถ้ามี
+const port = process.env.PORT || 8000; 
 
 app.use(cors());
 app.use(express.json());
