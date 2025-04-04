@@ -97,7 +97,7 @@ app.delete("/projects/:id", async (req, res) => {
   }
 });
 
-// ✅ เพิ่มการตรวจสอบ port ว่าง
+
 app.listen(port, async () => {
   await initMySQL();
   console.log(`🚀 Server running on http://localhost:${port}`);
